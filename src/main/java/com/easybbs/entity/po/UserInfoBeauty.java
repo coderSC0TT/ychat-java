@@ -11,7 +11,7 @@ public class UserInfoBeauty implements Serializable {
 
 
 	/**
-	 * 
+	 *
 	 */
 	private Integer id;
 
@@ -22,7 +22,6 @@ public class UserInfoBeauty implements Serializable {
 
 	/**
 	 * 用户id
-
 	 */
 	private String userId;
 
@@ -32,41 +31,46 @@ public class UserInfoBeauty implements Serializable {
 	private Integer status;
 
 
-	public void setId(Integer id){
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Integer getId(){
+	public Integer getId() {
 		return this.id;
 	}
 
-	public void setEmail(String email){
+	public void setEmail(String email) {
 		this.email = email;
 	}
 
-	public String getEmail(){
+	public String getEmail() {
 		return this.email;
 	}
 
-	public void setUserId(String userId){
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 
-	public String getUserId(){
+	public String getUserId() {
 		return this.userId;
 	}
 
-	public void setStatus(Integer status){
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
-	public Integer getStatus(){
+	public Integer getStatus() {
 		return this.status;
 	}
 
+
 	@Override
-	public String toString (){
-		return "id:"+(id == null ? "空" : id)+"，邮箱:"+(email == null ? "空" : email)+"，用户id
-:"+(userId == null ? "空" : userId)+"，0:未使用 1:已使用:"+(status == null ? "空" : status);
+	public String toString() {
+		return "id:" + (id == null ? "空" : id)
+				+ ", 邮箱:" + (email == null ? "空" : email)
+				+ ", 用户ID:" + (userId == null ? "空" : userId)
+				+ ", 状态:" + (status == null ? "空" : status == 0 ? "未使用" : "已使用");
 	}
+
+
 }

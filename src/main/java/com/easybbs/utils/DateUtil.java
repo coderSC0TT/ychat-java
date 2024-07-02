@@ -36,6 +36,10 @@ public class DateUtil {
         return getSdf(pattern).format(date);
     }
 
+    public static String format(Long date, String pattern) {
+        return getSdf(pattern).format(date);
+    }
+
     public static Date parse(String dateStr, String pattern) {
         try {
             return getSdf(pattern).parse(dateStr);
