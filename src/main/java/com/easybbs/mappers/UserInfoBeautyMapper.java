@@ -1,10 +1,12 @@
 package com.easybbs.mappers;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
  * 靓号表 数据库操作接口
  */
+
 public interface UserInfoBeautyMapper<T,P> extends BaseMapper<T,P> {
 
 	/**
