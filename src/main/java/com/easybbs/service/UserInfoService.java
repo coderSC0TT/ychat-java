@@ -87,4 +87,9 @@ public interface UserInfoService {
 	 */
 	Integer deleteUserInfoByEmail(String email);
 
+	/**
+	 * 注册
+	 */
+	void register(String email, String nickName,String password);
+
 }

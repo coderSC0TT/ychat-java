@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.easybbs.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
 import com.easybbs.entity.enums.PageSize;
@@ -150,5 +151,17 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Override
 	public Integer deleteUserInfoByEmail(String email) {
 		return this.userInfoMapper.deleteByEmail(email);
+	}
+
+	/**
+	 * 注册
+	 */
+	@Override
+	public void register(String email, String nickName, String password) {
+		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
+		if(null!=userInfo) {
+			throw  new BusinessException("邮箱账号已存在");
+		}
+
 	}
 }
