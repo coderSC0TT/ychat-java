@@ -1,6 +1,7 @@
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\UserInfoBeautyController.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\service\impl\UserInfoServiceImpl.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\service\impl\UserInfoBeautyServiceImpl.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\redis\redisConfig.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\ResponseCodeEnum.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\vo\PaginationResultVO.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\service\UserInfoBeautyService.java
@@ -8,7 +9,9 @@ D:\java-codes\ychat-java\src\main\java\com\easybbs\YChatApplication.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\SimplePage.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\mappers\UserInfoBeautyMapper.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\service\UserInfoService.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\constants\Constants.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\UserInfoController.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\redis\RedisUtils.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\ABaseController.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\PageSize.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\BaseParam.java
