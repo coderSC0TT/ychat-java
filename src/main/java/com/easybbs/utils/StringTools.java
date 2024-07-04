@@ -1,7 +1,9 @@
 package com.easybbs.utils;
 import com.easybbs.entity.constants.Constants;
+import com.easybbs.entity.enums.UserContactTypeEnum;
 import com.easybbs.exception.BusinessException;
 import jodd.util.RandomString;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.lang.reflect.Field;
@@ -56,7 +58,7 @@ public class StringTools {
     }
 
     public static  String getUserId() {
-        return getRandomNumber(Constants.LENGTH_11);
+        return UserContactTypeEnum.USER.getPrefix()+getRandomNumber(Constants.LENGTH_11);
     }
     public static  String getRandomNumber(Integer count) {
         return RandomStringUtils.random(count,false,true);
@@ -64,5 +66,8 @@ public class StringTools {
 
     public static  String getRandomString(Integer count) {
         return RandomStringUtils.random(count,true,true);
+    }
+    public static String encodeByMD5(String originString) {
+        return StringTools.isEmpty(originString) ? null : DigestUtils.md5Hex(originString);
     }
 }

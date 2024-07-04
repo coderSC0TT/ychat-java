@@ -15,6 +15,7 @@ D:\java-codes\ychat-java\src\main\java\com\easybbs\redis\RedisUtils.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\ABaseController.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\PageSize.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\BaseParam.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\UserContactTypeEnum.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\vo\ResponseVO.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\utils\StringTools.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\mappers\BaseMapper.java

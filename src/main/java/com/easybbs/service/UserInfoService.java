@@ -1,6 +1,7 @@
 package com.easybbs.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.easybbs.entity.query.UserInfoQuery;
 import com.easybbs.entity.po.UserInfo;
@@ -89,7 +90,9 @@ public interface UserInfoService {
 
 	/**
 	 * 注册
+	 *
+	 * @return
 	 */
-	void register(String email, String nickName,String password);
+	Map<String, Object> register(String email, String nickName, String password);
 
 }
