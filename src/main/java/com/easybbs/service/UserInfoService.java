@@ -1,8 +1,8 @@
 package com.easybbs.service;
 
 import java.util.List;
-import java.util.Map;
 
+import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.query.UserInfoQuery;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.vo.PaginationResultVO;
@@ -90,9 +90,9 @@ public interface UserInfoService {
 
 	/**
 	 * 注册
-	 *
-	 * @return
 	 */
-	Map<String, Object> register(String email, String nickName, String password);
+	void register(String email, String nickName, String password);
+
+	 TokenUserInfoDto login(String email, String password);
 
 }

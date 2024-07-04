@@ -1,6 +1,7 @@
 package com.easybbs.controller;
 
 import com.easybbs.entity.constants.Constants;
+import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.vo.ResponseVO;
 import com.easybbs.exception.BusinessException;
 import com.easybbs.redis.RedisUtils;
@@ -60,6 +61,22 @@ public class AccountController extends  ABaseController{
             return getSuccessResponseVO(null);
         }finally {
             //如果错误 删除缓存防止重试
+            redisUtils.delete(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey);
+        }
+
+    }
+
+    @RequestMapping("/login")
+    public ResponseVO login(@NotEmpty String checkCodeKey,
+                               @NotEmpty @Email String email,
+                               @NotEmpty String password,
+                               @NotEmpty String checkCode){
+        try{
+            if(!checkCode.equalsIgnoreCase((String) redisUtils.get(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey)))
+                throw new BusinessException("图片验证码不正确");
+            TokenUserInfoDto tokenUserInfoDto=userInfoService.login(email, password);
+            return getSuccessResponseVO(null);
+        }finally {
             redisUtils.delete(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey);
         }
 

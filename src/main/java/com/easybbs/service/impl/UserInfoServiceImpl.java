@@ -1,17 +1,18 @@
 package com.easybbs.service.impl;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 
+import com.easybbs.entity.config.AppConfig;
+import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.enums.BeautyAccountStatusEnum;
 import com.easybbs.entity.enums.UserContactTypeEnum;
 import com.easybbs.entity.enums.UserStatusEnum;
 import com.easybbs.entity.po.UserInfoBeauty;
+import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.UserInfoBeautyMapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 
 import com.easybbs.entity.enums.PageSize;
@@ -32,6 +33,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 	@Resource
 	private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
+
+	@Resource
+	private AppConfig appConfig;
 
 	@Resource
 	private UserInfoBeautyMapper userInfoBeautyMapper;
@@ -164,45 +168,71 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 	/**
 	 * 注册
-	 *
-	 * @return
 	 */
 	@Override
-	public Map<String, Object> register(String email, String nickName, String password) {
-		Map<String,Object> result = new HashMap<String,Object>();
+	public void register(String email, String nickName, String password) {
+		Map<String, Object> result = new HashMap<String, Object>();
 		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
-		if(null!=userInfo) {
-			String userId = StringTools.getUserId();
-			UserInfoBeauty beautyAccount= (UserInfoBeauty) this.userInfoBeautyMapper.selectByEmail(email);
-			//靓号必须有且没有被使用
-			Boolean useBeautyAccount = null !=beautyAccount && BeautyAccountStatusEnum.NO_USE.getStatus().equals(beautyAccount.getStatus()) ;
-			if(useBeautyAccount) {
-				userId= UserContactTypeEnum.USER.getPrefix()+ beautyAccount.getUserId();
-			}
-			Date curDate = new Date();
-			userInfo =new UserInfo();
-			userInfo.setUserId(userId);
-			userInfo.setNickName(nickName);
-			userInfo.setEmail(email);
-			userInfo.setPassword(StringTools.encodeByMD5(password));
-			userInfo.setCreateTime(curDate);
-			userInfo.setStatus(String.valueOf(UserStatusEnum.ENABLE.getStatus()));
-			userInfo.setLastOffTime(curDate.getTime());
-			this.userInfoMapper.insert(userInfo);
-
-			if(useBeautyAccount){
-				//更新靓号使用状态
-				UserInfoBeauty updateBeauty = new UserInfoBeauty();
-				updateBeauty.setStatus(BeautyAccountStatusEnum.USEED.getStatus());
-				this.userInfoBeautyMapper.updateById(updateBeauty,beautyAccount.getId());
-			} //TODO 创造机器人好友
-		}else {
-			result.put("success",false);
-			result.put("errorMsg","邮箱已存在");
-			return result;
+		if (null != userInfo) {
+			throw new BusinessException("邮箱账号已经存在");
 		}
 
-		return result;
+		String userId = StringTools.getUserId();
+		UserInfoBeauty beautyAccount = (UserInfoBeauty) this.userInfoBeautyMapper.selectByEmail(email);
+		//靓号必须有且没有被使用
+		Boolean useBeautyAccount = null != beautyAccount && BeautyAccountStatusEnum.NO_USE.getStatus().equals(beautyAccount.getStatus());
+		if (useBeautyAccount) {
+			userId = UserContactTypeEnum.USER.getPrefix() + beautyAccount.getUserId();
+		}
+		Date curDate = new Date();
+		userInfo = new UserInfo();
+		userInfo.setUserId(userId);
+		userInfo.setNickName(nickName);
+		userInfo.setEmail(email);
+		//TODO 加密方式注解优化
+		userInfo.setPassword(StringTools.encodeByMD5(password));
+		userInfo.setCreateTime(curDate);
+		userInfo.setStatus(String.valueOf(UserStatusEnum.ENABLE.getStatus()));
+		userInfo.setLastOffTime(curDate.getTime());
+		this.userInfoMapper.insert(userInfo);
+
+		if (useBeautyAccount) {
+			//更新靓号使用状态
+			UserInfoBeauty updateBeauty = new UserInfoBeauty();
+			updateBeauty.setStatus(BeautyAccountStatusEnum.USEED.getStatus());
+			this.userInfoBeautyMapper.updateById(updateBeauty, beautyAccount.getId());
+		} //TODO 创造机器人好友
+
+
+	}
+
+	@Override
+	public TokenUserInfoDto login(String email, String password) {
+		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
+		if(null == userInfo || !userInfo.getPassword().equals(StringTools.encodeByMD5(password))) {
+			throw new BusinessException("账号密码不存在");
+		}
+		if(UserStatusEnum.DISABLE.equals(userInfo.getStatus())) {
+			throw new BusinessException("账号已禁用");
+		}
+		TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto(userInfo);
+
+		return tokenUserInfoDto;
+	}
+
+	//判断是否为管理员
+	private TokenUserInfoDto getTokenUserInfoDto(UserInfo userInfo) {
+		TokenUserInfoDto tokenUserInfoDto = new TokenUserInfoDto();
+		tokenUserInfoDto.setUserId(userInfo.getUserId());
+		tokenUserInfoDto.setNickName(userInfo.getNickName());
+
+		String adminEmails = appConfig.getAdminEmails();
+		if (!StringTools.isEmpty(adminEmails) && ArrayUtils.contains(adminEmails.split(","), userInfo.getEmail())) {
+			tokenUserInfoDto.setAdmin(true);
+		} else {
+			tokenUserInfoDto.setAdmin(false);
+		}
+		return tokenUserInfoDto;
 	}
 
 
