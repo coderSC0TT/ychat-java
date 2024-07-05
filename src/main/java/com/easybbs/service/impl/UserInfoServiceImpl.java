@@ -5,6 +5,7 @@ import java.util.*;
 import javax.annotation.Resource;
 
 import com.easybbs.entity.config.AppConfig;
+import com.easybbs.entity.constants.Constants;
 import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.enums.BeautyAccountStatusEnum;
 import com.easybbs.entity.enums.UserContactTypeEnum;
@@ -12,6 +13,7 @@ import com.easybbs.entity.enums.UserStatusEnum;
 import com.easybbs.entity.po.UserInfoBeauty;
 import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.UserInfoBeautyMapper;
+import com.easybbs.redis.RedisComponent;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 	@Resource
 	private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
+
+	@Resource
+	private RedisComponent redisComponent;
 
 	@Resource
 	private AppConfig appConfig;
@@ -215,8 +220,17 @@ public class UserInfoServiceImpl implements UserInfoService {
 		if(UserStatusEnum.DISABLE.equals(userInfo.getStatus())) {
 			throw new BusinessException("账号已禁用");
 		}
+		//TODO 查询联系人 查询我的群组
 		TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto(userInfo);
 
+		Long lastHeartBeat= redisComponent.getUserHeartBeat(userInfo.getUserId());
+		if(null != lastHeartBeat) {
+			throw new BusinessException("此账号已在别处登录 请退出后再登录");
+		}
+		//保存信息到redis中
+		String token = StringTools.encodeByMD5(tokenUserInfoDto.getUserId()+StringTools.getRandomString(Constants.LENGTH_20));
+		tokenUserInfoDto.setToken(token);
+		redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);
 		return tokenUserInfoDto;
 	}
 
