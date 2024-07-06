@@ -6,6 +6,7 @@ import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.query.UserInfoQuery;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.vo.PaginationResultVO;
+import com.easybbs.entity.vo.UserInfoVO;
 
 
 /**
@@ -93,6 +94,6 @@ public interface UserInfoService {
 	 */
 	void register(String email, String nickName, String password);
 
-	 TokenUserInfoDto login(String email, String password);
+	 UserInfoVO login(String email, String password);
 
 }

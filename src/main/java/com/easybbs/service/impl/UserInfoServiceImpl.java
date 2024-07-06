@@ -7,17 +7,16 @@ import javax.annotation.Resource;
 import com.easybbs.entity.config.AppConfig;
 import com.easybbs.entity.constants.Constants;
 import com.easybbs.entity.dto.TokenUserInfoDto;
-import com.easybbs.entity.enums.BeautyAccountStatusEnum;
-import com.easybbs.entity.enums.UserContactTypeEnum;
-import com.easybbs.entity.enums.UserStatusEnum;
+import com.easybbs.entity.enums.*;
 import com.easybbs.entity.po.UserInfoBeauty;
+import com.easybbs.entity.vo.UserInfoVO;
 import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.UserInfoBeautyMapper;
 import com.easybbs.redis.RedisComponent;
+import com.easybbs.utils.CopyTools;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 
-import com.easybbs.entity.enums.PageSize;
 import com.easybbs.entity.query.UserInfoQuery;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.vo.PaginationResultVO;
@@ -25,6 +24,7 @@ import com.easybbs.entity.query.SimplePage;
 import com.easybbs.mappers.UserInfoMapper;
 import com.easybbs.service.UserInfoService;
 import com.easybbs.utils.StringTools;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -175,6 +175,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	 * 注册
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void register(String email, String nickName, String password) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
@@ -212,7 +213,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	}
 
 	@Override
-	public TokenUserInfoDto login(String email, String password) {
+	public UserInfoVO login(String email, String password) {
 		UserInfo userInfo = this.userInfoMapper.selectByEmail(email);
 		if(null == userInfo || !userInfo.getPassword().equals(StringTools.encodeByMD5(password))) {
 			throw new BusinessException("账号密码不存在");
@@ -231,7 +232,13 @@ public class UserInfoServiceImpl implements UserInfoService {
 		String token = StringTools.encodeByMD5(tokenUserInfoDto.getUserId()+StringTools.getRandomString(Constants.LENGTH_20));
 		tokenUserInfoDto.setToken(token);
 		redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);
-		return tokenUserInfoDto;
+
+		//登录时返回全部信息 缓存到客户端 省去再查的过程
+		UserInfoVO userInfoVO= CopyTools.copy(userInfo,UserInfoVO.class);
+		userInfoVO.setToken(tokenUserInfoDto.getToken());
+		userInfoVO.setAdmin(tokenUserInfoDto.getAdmin());
+		userInfoVO.setJoinType(JoinTypeEnum.APPLY.getType());
+		return userInfoVO;
 	}
 
 	//判断是否为管理员
