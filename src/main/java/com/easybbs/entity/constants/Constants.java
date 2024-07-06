@@ -1,5 +1,7 @@
 package com.easybbs.entity.constants;
 
+import com.easybbs.entity.enums.UserContactTypeEnum;
+
 /**
  * @ClassName constants
  * @Description 添加描述
@@ -64,6 +66,7 @@ public class Constants {
 
     public static final Integer REDIS_KEY_TOKEN_EXPIRES = REDIS_KEY_EXPIRES_DAY * 2;
 
+    public static final String ROBOT_UID = UserContactTypeEnum.USER.getPrefix() + "robot";
 
     public static final String REDIS_KEY_CHECK_CODE = "easychat:checkcode:";
     public static final String REDIS_KEY_WS_TOKEN = "easychat:ws:token:";

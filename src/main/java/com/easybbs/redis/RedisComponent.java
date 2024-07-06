@@ -29,5 +29,8 @@ public class RedisComponent {
         //用userId再存一个token 便于通过id取DTO 通过DTO取token 因为聊天时取id
         redisUtils.setex(Constants.REDIS_KEY_WS_TOKEN_USERID+tokenUserInfoDto.getToken(),tokenUserInfoDto.getToken(),Constants.REDIS_KEY_EXPIRES_DAY*2);
     }
+
+
+
 }
 

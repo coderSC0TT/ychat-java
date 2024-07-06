@@ -25,6 +25,7 @@ D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\UserContactTypeE
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\vo\ResponseVO.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\utils\StringTools.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\mappers\BaseMapper.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\dto\SysSettingDto.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\po\UserInfoBeauty.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\AccountController.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\po\UserInfo.java
@@ -34,6 +35,7 @@ D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\DateTimePatternE
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\UserInfoQuery.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\InitRun.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\mappers\UserInfoMapper.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\JoinTypeEnum.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\utils\DateUtil.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\UserInfoBeautyQuery.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\BeautyAccountStatusEnum.java
