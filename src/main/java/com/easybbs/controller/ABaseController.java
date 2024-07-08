@@ -1,7 +1,13 @@
 package com.easybbs.controller;
+import com.easybbs.entity.constants.Constants;
+import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.enums.ResponseCodeEnum;
 import com.easybbs.entity.vo.ResponseVO;
 import com.easybbs.exception.BusinessException;
+import com.easybbs.redis.RedisUtils;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 
 public class ABaseController {
@@ -9,6 +15,9 @@ public class ABaseController {
     protected static final String STATUC_SUCCESS = "success";
 
     protected static final String STATUC_ERROR = "error";
+
+    @Resource
+    private RedisUtils redisUtils;
 
     protected <T> ResponseVO getSuccessResponseVO(T t) {
         ResponseVO<T> responseVO = new ResponseVO<>();
@@ -39,5 +48,11 @@ public class ABaseController {
         vo.setInfo(ResponseCodeEnum.CODE_500.getMsg());
         vo.setData(t);
         return vo;
+    }
+
+    protected TokenUserInfoDto getTokenUserInfo(HttpServletRequest request) {
+        String token = request.getHeader("token");
+        TokenUserInfoDto tokenUserInfoDto = (TokenUserInfoDto)redisUtils.get(Constants.REDIS_KEY_WS_TOKEN + token);
+        return tokenUserInfoDto;
     }
 }
