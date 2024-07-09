@@ -1,5 +1,6 @@
 package com.easybbs.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.easybbs.annotation.GlobalInterceptor;
@@ -37,7 +38,7 @@ public class GroupInfoController extends ABaseController{
 								 String groupNotice,
 								 @NotNull Integer joinType,
 								 MultipartFile avatarFile,
-								 MultipartFile avatarCover){
+								 MultipartFile avatarCover) throws IOException {
 		TokenUserInfoDto tokenUserInfoDto =  getTokenUserInfo(request);
 		//组装
 		GroupInfo groupInfo = new GroupInfo();

@@ -1,10 +1,14 @@
 package com.easybbs.service.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.easybbs.entity.config.AppConfig;
+import com.easybbs.entity.constants.Constants;
 import com.easybbs.entity.dto.SysSettingDto;
 import com.easybbs.entity.enums.ResponseCodeEnum;
 import com.easybbs.entity.enums.UserContactStatusEnum;
@@ -39,6 +43,10 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 
 	@Resource
 	private UserContactMapper userContactMapper;
+
+	@Resource
+	private AppConfig appConfig;
+
 	@Resource
 	private GroupInfoMapper<GroupInfo, GroupInfoQuery> groupInfoMapper;
 
@@ -147,7 +155,7 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover) {
+	public void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover) throws IOException {
 		Date curDate = new Date();
 
 		if(StringTools.isEmpty(groupInfo.getGroupId())){ //如果空 新增 不然就是修改
@@ -175,8 +183,29 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 			userContact.setCreateTime(curDate);
 			this.userContactMapper.insert(userContact);
 			//TODO 创建会话
+			//TODO 发送消息(bot)
 		}else{
-
+			GroupInfo dbInfo = this.groupInfoMapper.selectByGroupId(groupInfo.getGroupId());
+			//修改前判断当前用户是不是对应的群主 后端保底
+			if(!dbInfo.getGroupOwnerId().equals(groupInfo.getGroupOwnerId())){
+				throw  new BusinessException(ResponseCodeEnum.CODE_600);
+			}
+			this.groupInfoMapper.updateByGroupId(groupInfo, groupInfo.getGroupId());
+			//TODO 更新相关表冗余信息
+			//TODO 修改群昵称发送ws消息
+			if(null == avatarFile){
+				return;
+			}
+			String baseFold = appConfig.getProjectFolder()+ Constants.FILE_FOLDER_FILE;
+			File  targetFileFolder = new File(baseFold + Constants.FILE_FOLDER_AVATAR_NAME);
+			//没有就建一个
+			if(!targetFileFolder.exists()){
+				targetFileFolder.mkdirs();
+			}
+			String filePath = targetFileFolder.getPath()+"/"+groupInfo.getGroupId()+Constants.IMAGE_SUFFIX;
+		    //原图与缩略图
+			avatarFile.transferTo(new File(filePath));
+			avatarCover.transferTo(new File(filePath+Constants.COVER_IMAGE_SUFFIX));
 		}
 	}
 }

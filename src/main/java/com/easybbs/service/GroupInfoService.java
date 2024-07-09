@@ -1,5 +1,6 @@
 package com.easybbs.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.easybbs.entity.query.GroupInfoQuery;
@@ -73,5 +74,5 @@ public interface GroupInfoService {
 	/**
 	 * 新增group
 	 */
-	void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover);
+	void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover) throws IOException;
 }

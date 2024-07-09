@@ -107,5 +107,7 @@ public class Constants {
     //被管理员踢群
     public static final String out_group_TEMPLATE = "%s被管理员移出了群聊";
 
+    //public static final String FILE_FOLDER_FILE = "/file/";
+
 }
 
