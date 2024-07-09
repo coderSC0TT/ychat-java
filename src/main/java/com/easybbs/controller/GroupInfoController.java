@@ -39,6 +39,14 @@ public class GroupInfoController extends ABaseController{
 								 MultipartFile avatarFile,
 								 MultipartFile avatarCover){
 		TokenUserInfoDto tokenUserInfoDto =  getTokenUserInfo(request);
+		//组装
+		GroupInfo groupInfo = new GroupInfo();
+		groupInfo.setGroupId(groupId);
+		groupInfo.setGroupOwnerId(tokenUserInfoDto.getUserId());
+		groupInfo.setGroupName(groupName);
+		groupInfo.setGroupNotice(groupNotice);
+		groupInfo.setJoinType(joinType);
+		this.groupInfoService.saveGroup(groupInfo,avatarFile,avatarCover);
 		return getSuccessResponseVO(null);
 	}
 }

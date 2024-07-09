@@ -42,6 +42,7 @@ public class GlobalOperationAspect {
             Method method = ((MethodSignature) point.getSignature()).getMethod();
             GlobalInterceptor interceptor = method.getAnnotation(GlobalInterceptor.class);
             if (null == interceptor) return;
+            //如果注解配置了需要检查登录或管理员权限,则调用checkLogin()方法进行检查
             if (interceptor.checkLogin() || interceptor.checkAdmin()) {
                 checkLogin(interceptor.checkAdmin());
             }

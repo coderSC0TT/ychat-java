@@ -5,6 +5,7 @@ import java.util.List;
 import com.easybbs.entity.query.GroupInfoQuery;
 import com.easybbs.entity.po.GroupInfo;
 import com.easybbs.entity.vo.PaginationResultVO;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -69,4 +70,8 @@ public interface GroupInfoService {
 	 */
 	Integer deleteGroupInfoByGroupId(String groupId);
 
+	/**
+	 * 新增group
+	 */
+	void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover);
 }

@@ -1,9 +1,19 @@
 package com.easybbs.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.easybbs.entity.dto.SysSettingDto;
+import com.easybbs.entity.enums.ResponseCodeEnum;
+import com.easybbs.entity.enums.UserContactStatusEnum;
+import com.easybbs.entity.enums.UserContactTypeEnum;
+import com.easybbs.entity.po.UserContact;
+import com.easybbs.exception.BusinessException;
+import com.easybbs.mappers.UserContactMapper;
+import com.easybbs.redis.RedisComponent;
+import com.easybbs.redis.RedisUtils;
 import org.springframework.stereotype.Service;
 
 import com.easybbs.entity.enums.PageSize;
@@ -14,6 +24,8 @@ import com.easybbs.entity.query.SimplePage;
 import com.easybbs.mappers.GroupInfoMapper;
 import com.easybbs.service.GroupInfoService;
 import com.easybbs.utils.StringTools;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -22,6 +34,11 @@ import com.easybbs.utils.StringTools;
 @Service("groupInfoService")
 public class GroupInfoServiceImpl implements GroupInfoService {
 
+	@Resource
+	private RedisComponent 	redisComponent;
+
+	@Resource
+	private UserContactMapper userContactMapper;
 	@Resource
 	private GroupInfoMapper<GroupInfo, GroupInfoQuery> groupInfoMapper;
 
@@ -126,5 +143,40 @@ public class GroupInfoServiceImpl implements GroupInfoService {
 	@Override
 	public Integer deleteGroupInfoByGroupId(String groupId) {
 		return this.groupInfoMapper.deleteByGroupId(groupId);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void saveGroup(GroupInfo groupInfo, MultipartFile avatarFile, MultipartFile avatarCover) {
+		Date curDate = new Date();
+
+		if(StringTools.isEmpty(groupInfo.getGroupId())){ //如果空 新增 不然就是修改
+			GroupInfoQuery groupInfoQuery = new GroupInfoQuery();
+			groupInfoQuery.setGroupOwnerId(groupInfo.getGroupOwnerId());
+			//获取系统设置 如果创建群组超限则不允许
+			Integer count = this.groupInfoMapper.selectCount(groupInfoQuery);
+			SysSettingDto sysSettingDto = redisComponent.getSysSetting();
+			if(count>=sysSettingDto.getMaxGroupCount()){
+				throw  new BusinessException("最多支持创建"+sysSettingDto.getMaxGroupCount()+"个群聊");
+			}
+			if(null == avatarFile){
+				throw  new BusinessException(ResponseCodeEnum.CODE_600);
+			}
+			groupInfo.setCreateTime(curDate);
+			groupInfo.setGroupId(StringTools.getGroupId());
+			this.groupInfoMapper.insert(groupInfo);
+
+			//将群组添加为联系人
+			UserContact userContact = new UserContact();
+			userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			userContact.setContactType(UserContactTypeEnum.GROUP.getType());
+			userContact.setContactId(groupInfo.getGroupId());
+			userContact.setUserId(groupInfo.getGroupOwnerId());
+			userContact.setCreateTime(curDate);
+			this.userContactMapper.insert(userContact);
+			//TODO 创建会话
+		}else{
+
+		}
 	}
 }
