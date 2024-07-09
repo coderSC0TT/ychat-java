@@ -38,6 +38,7 @@ D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\vo\PaginationResultVO.
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\vo\UserInfoVO.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\service\UserInfoBeautyService.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\YChatApplication.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\UserContactStatusEnum.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\SimplePage.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\mappers\UserInfoBeautyMapper.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\UserStatusEnum.java
