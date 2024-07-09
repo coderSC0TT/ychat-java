@@ -50,4 +50,15 @@ public class GroupInfoController extends ABaseController{
 		this.groupInfoService.saveGroup(groupInfo,avatarFile,avatarCover);
 		return getSuccessResponseVO(null);
 	}
+
+	@RequestMapping("/loadMygroup")
+	@GlobalInterceptor //校验登录
+	public  ResponseVO loadMygroup(HttpServletRequest request) throws IOException {
+		TokenUserInfoDto tokenUserInfoDto =  getTokenUserInfo(request);
+		GroupInfoQuery groupInfoQuery = new GroupInfoQuery();
+		groupInfoQuery.setGroupOwnerId(tokenUserInfoDto.getUserId());
+		groupInfoQuery.setOrderBy("create_time desc");
+		List<GroupInfo> groupInfoList = this.groupInfoService.findListByParam(groupInfoQuery);
+		return getSuccessResponseVO(groupInfoList);
+	}
 }
