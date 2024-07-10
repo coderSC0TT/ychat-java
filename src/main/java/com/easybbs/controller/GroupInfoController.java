@@ -100,7 +100,7 @@ public class GroupInfoController extends ABaseController{
 		GroupInfo groupInfo = this.groupInfoService.getGroupInfoByGroupId(groupId);
 		UserContactQuery userContactQuery = new UserContactQuery();
 		userContactQuery.setContactId(groupId);
-		//做关联
+		//有一个关联查询 直接查只有id没有名称 但是不是所有查询都需要关联查
 		userContactQuery.setQueryUserInfo(true);
 		userContactQuery.setOrderBy("create_time asc"); //按照加入顺序查
 		userContactQuery.setStatus(UserContactStatusEnum.FRIEND.getStatus());

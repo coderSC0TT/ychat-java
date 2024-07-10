@@ -21,6 +21,7 @@ import java.util.Date;
 public class UserContact implements Serializable {
 
 
+
     /**
      * 用户ID
      */
