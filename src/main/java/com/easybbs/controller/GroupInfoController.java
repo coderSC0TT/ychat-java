@@ -11,6 +11,7 @@ import com.easybbs.entity.po.UserContact;
 import com.easybbs.entity.query.GroupInfoQuery;
 import com.easybbs.entity.po.GroupInfo;
 import com.easybbs.entity.query.UserContactQuery;
+import com.easybbs.entity.vo.GroupInfoVO;
 import com.easybbs.entity.vo.ResponseVO;
 import com.easybbs.exception.BusinessException;
 import com.easybbs.service.GroupInfoService;
@@ -90,6 +91,24 @@ public class GroupInfoController extends ABaseController{
 		Integer memberCount = this.userContactService.findCountByParam(userContactQuery);
 		groupInfo.setMemberCount(memberCount);
 		return getSuccessResponseVO(groupInfo);
+	}
+
+	//获取聊天会话群聊详情
+	@RequestMapping("/groupInfo4Chat")
+	//@GlobalInterceptor //校验登录
+	public  ResponseVO groupInfo4Chat(HttpServletRequest request,@NotEmpty String groupId) throws IOException {
+		GroupInfo groupInfo = this.groupInfoService.getGroupInfoByGroupId(groupId);
+		UserContactQuery userContactQuery = new UserContactQuery();
+		userContactQuery.setContactId(groupId);
+		//做关联
+		userContactQuery.setQueryUserInfo(true);
+		userContactQuery.setOrderBy("create_time asc"); //按照加入顺序查
+		userContactQuery.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+		List<UserContact> userContactList = this.userContactService.findListByParam(userContactQuery);
+		GroupInfoVO groupInfoVO = new GroupInfoVO();
+		groupInfoVO.setGroupInfo(groupInfo);
+		groupInfoVO.setUserContactList(userContactList);
+		return getSuccessResponseVO(groupInfoVO);
 	}
 
 

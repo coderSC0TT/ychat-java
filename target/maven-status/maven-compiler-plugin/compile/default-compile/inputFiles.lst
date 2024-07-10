@@ -20,6 +20,7 @@ D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\po\UserInfoBeauty.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\GroupInfoController.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\exception\BusinessException.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\AGlobalExceptionHandlerController.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\GroupStatusEnum.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\mappers\GroupInfoMapper.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\service\UserContactApplyService.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\UserInfoQuery.java
@@ -27,6 +28,7 @@ D:\java-codes\ychat-java\src\main\java\com\easybbs\InitRun.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\utils\DateUtil.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\query\UserInfoBeautyQuery.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\enums\BeautyAccountStatusEnum.java
+D:\java-codes\ychat-java\src\main\java\com\easybbs\entity\vo\GroupInfoVO.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\utils\CopyTools.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\controller\UserInfoBeautyController.java
 D:\java-codes\ychat-java\src\main\java\com\easybbs\service\impl\UserInfoServiceImpl.java

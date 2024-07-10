@@ -51,6 +51,15 @@ public class UserContactQuery extends BaseParam {
 
 	private String lastUpdateTimeEnd;
 
+	private  Boolean queryUserInfo;
+
+	public Boolean getQueryUserInfo() {
+		return queryUserInfo;
+	}
+
+	public void setQueryUserInfo(Boolean queryUserInfo) {
+		this.queryUserInfo = queryUserInfo;
+	}
 
 	public void setUserId(String userId){
 		this.userId = userId;
