@@ -69,4 +69,5 @@ public interface UserContactService {
 	 */
 	Integer deleteUserContactByUserIdAndContactId(String userId,String contactId);
 
+	void searchContact(String userId,String contactId);
 }
