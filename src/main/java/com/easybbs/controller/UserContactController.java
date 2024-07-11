@@ -2,6 +2,7 @@ package com.easybbs.controller;
 
 import com.easybbs.annotation.GlobalInterceptor;
 import com.easybbs.entity.dto.TokenUserInfoDto;
+import com.easybbs.entity.dto.UserContactSearchResultDto;
 import com.easybbs.entity.po.UserContactApply;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.vo.ResponseVO;
@@ -38,8 +39,8 @@ public class UserContactController extends  ABaseController {
     @GlobalInterceptor
     public ResponseVO search(HttpServletRequest request, @NotEmpty String contactId) {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
-
-        return getSuccessResponseVO(null);
+        UserContactSearchResultDto userContactSearchResultDto = userContactService.searchContact(tokenUserInfoDto.getUserId(),contactId);
+        return getSuccessResponseVO(userContactSearchResultDto);
     }
 }
 

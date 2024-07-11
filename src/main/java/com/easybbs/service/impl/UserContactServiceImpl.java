@@ -4,6 +4,16 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.easybbs.entity.dto.UserContactSearchResultDto;
+import com.easybbs.entity.enums.UserContactStatusEnum;
+import com.easybbs.entity.enums.UserContactTypeEnum;
+import com.easybbs.entity.po.GroupInfo;
+import com.easybbs.entity.po.UserInfo;
+import com.easybbs.entity.query.GroupInfoQuery;
+import com.easybbs.entity.query.UserInfoQuery;
+import com.easybbs.mappers.GroupInfoMapper;
+import com.easybbs.mappers.UserInfoMapper;
+import com.easybbs.utils.CopyTools;
 import org.springframework.stereotype.Service;
 
 import com.easybbs.entity.enums.PageSize;
@@ -25,6 +35,11 @@ public class UserContactServiceImpl implements UserContactService {
 	@Resource
 	private UserContactMapper<UserContact, UserContactQuery> userContactMapper;
 
+	@Resource
+	private UserInfoMapper<UserInfo, UserInfoQuery> userInfoMapper;
+
+	@Resource
+	private GroupInfoMapper<GroupInfo, GroupInfoQuery> groupInfoMapper;
 	/**
 	 * 根据条件查询列表
 	 */
@@ -126,5 +141,41 @@ public class UserContactServiceImpl implements UserContactService {
 	@Override
 	public Integer deleteUserContactByUserIdAndContactId(String userId, String contactId) {
 		return this.userContactMapper.deleteByUserIdAndContactId(userId, contactId);
+	}
+
+	@Override
+	public UserContactSearchResultDto searchContact(String userId, String contactId) {
+		//找搜索的是好友还是群
+		UserContactTypeEnum typeEnum = UserContactTypeEnum.getByPrefix(contactId);
+		if(null == typeEnum) {
+			return null;
+		}
+		UserContactSearchResultDto resultDto = new UserContactSearchResultDto();
+		switch (typeEnum){
+			case USER:
+				UserInfo userInfo = userInfoMapper.selectByUserId(contactId);
+				if(null == userInfo) {
+					return null;
+				}
+				resultDto = CopyTools.copy(userInfo,UserContactSearchResultDto.class);
+				break;
+			case GROUP:
+				GroupInfo groupInfo = groupInfoMapper.selectByGroupId(contactId);
+				if(null == groupInfo) {
+					return null;
+				}
+				resultDto = CopyTools.copy(groupInfo,UserContactSearchResultDto.class);
+				break;
+		}
+		resultDto.setContactType(typeEnum.toString());
+		resultDto.setContactId(contactId);
+		if(userId.equals(contactId)){
+			resultDto.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			return resultDto;
+		}
+		//查询是否为好友
+		UserContact userContact =this.userContactMapper.selectByUserIdAndContactId(userId, contactId);
+		resultDto.setStatus(userContact==null?null:userContact.getStatus());
+		return resultDto;
 	}
 }

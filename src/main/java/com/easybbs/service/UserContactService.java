@@ -2,6 +2,7 @@ package com.easybbs.service;
 
 import java.util.List;
 
+import com.easybbs.entity.dto.UserContactSearchResultDto;
 import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.entity.po.UserContact;
 import com.easybbs.entity.vo.PaginationResultVO;
@@ -69,5 +70,8 @@ public interface UserContactService {
 	 */
 	Integer deleteUserContactByUserIdAndContactId(String userId,String contactId);
 
-	void searchContact(String userId,String contactId);
+	/**
+	 * 搜索联系人
+	 */
+	UserContactSearchResultDto searchContact(String userId, String contactId);
 }
