@@ -2,7 +2,9 @@ package com.easybbs.service;
 
 import java.util.List;
 
+import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
+import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.entity.po.UserContact;
 import com.easybbs.entity.vo.PaginationResultVO;
@@ -74,4 +76,9 @@ public interface UserContactService {
 	 * 搜索联系人
 	 */
 	UserContactSearchResultDto searchContact(String userId, String contactId);
+
+	/**
+	 * 直接加入还是发送申请
+	 */
+	Integer applyAdd(TokenUserInfoDto tokenUserInfoDto,String contactId,String applyInfo);
 }

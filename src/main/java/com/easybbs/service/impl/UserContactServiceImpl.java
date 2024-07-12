@@ -4,13 +4,17 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.easybbs.entity.constants.Constants;
+import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
+import com.easybbs.entity.enums.ResponseCodeEnum;
 import com.easybbs.entity.enums.UserContactStatusEnum;
 import com.easybbs.entity.enums.UserContactTypeEnum;
 import com.easybbs.entity.po.GroupInfo;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.query.GroupInfoQuery;
 import com.easybbs.entity.query.UserInfoQuery;
+import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.GroupInfoMapper;
 import com.easybbs.mappers.UserInfoMapper;
 import com.easybbs.utils.CopyTools;
@@ -177,5 +181,19 @@ public class UserContactServiceImpl implements UserContactService {
 		UserContact userContact =this.userContactMapper.selectByUserIdAndContactId(userId, contactId);
 		resultDto.setStatus(userContact==null?null:userContact.getStatus());
 		return resultDto;
+	}
+
+	@Override
+	public Integer applyAdd(TokenUserInfoDto tokenUserInfoDto, String contactId, String applyInfo) {
+		UserContactTypeEnum contactTypeEnum = UserContactTypeEnum.getByPrefix(contactId);
+		if(null== contactTypeEnum) {
+			throw  new BusinessException(ResponseCodeEnum.CODE_600);
+		}
+		//申请人
+		String applyUserId = tokenUserInfoDto.getUserId();
+
+		//默认申请信息
+		applyInfo =StringTools.isEmpty(applyInfo)? String.format(Constants.APPLY_INFO_TEMPLATE ,tokenUserInfoDto.getNickName()):applyUserId;
+
 	}
 }

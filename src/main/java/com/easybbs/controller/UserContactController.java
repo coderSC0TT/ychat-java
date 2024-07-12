@@ -42,5 +42,16 @@ public class UserContactController extends  ABaseController {
         UserContactSearchResultDto userContactSearchResultDto = userContactService.searchContact(tokenUserInfoDto.getUserId(),contactId);
         return getSuccessResponseVO(userContactSearchResultDto);
     }
+
+    @RequestMapping("/applyAdd")
+    @GlobalInterceptor
+    public ResponseVO applyAdd(HttpServletRequest request,
+                               @NotEmpty String contactId,
+                               @NotEmpty String applyType,
+                               String applyInfo) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        Integer joinType = userContactService.applyAdd(tokenUserInfoDto,contactId,applyInfo);
+        return getSuccessResponseVO(joinType);
+    }
 }
 
