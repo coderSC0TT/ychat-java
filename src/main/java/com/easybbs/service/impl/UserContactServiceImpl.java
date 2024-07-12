@@ -7,9 +7,7 @@ import javax.annotation.Resource;
 import com.easybbs.entity.constants.Constants;
 import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
-import com.easybbs.entity.enums.ResponseCodeEnum;
-import com.easybbs.entity.enums.UserContactStatusEnum;
-import com.easybbs.entity.enums.UserContactTypeEnum;
+import com.easybbs.entity.enums.*;
 import com.easybbs.entity.po.GroupInfo;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.query.GroupInfoQuery;
@@ -20,7 +18,6 @@ import com.easybbs.mappers.UserInfoMapper;
 import com.easybbs.utils.CopyTools;
 import org.springframework.stereotype.Service;
 
-import com.easybbs.entity.enums.PageSize;
 import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.entity.po.UserContact;
 import com.easybbs.entity.vo.PaginationResultVO;
@@ -193,7 +190,30 @@ public class UserContactServiceImpl implements UserContactService {
 		String applyUserId = tokenUserInfoDto.getUserId();
 
 		//默认申请信息
-		applyInfo =StringTools.isEmpty(applyInfo)? String.format(Constants.APPLY_INFO_TEMPLATE ,tokenUserInfoDto.getNickName()):applyUserId;
+		applyInfo =StringTools.isEmpty(applyInfo)? String.format(Constants.APPLY_INFO_TEMPLATE ,tokenUserInfoDto.getNickName()):applyInfo;
+		Long curTime = System.currentTimeMillis();
+		String receiveUserId = contactId;
+		Integer joinType =null;
+		//查询对方是否是自己好友 如果已经被拉黑则不可添加
+		UserContact userContact = userContactMapper.selectByUserIdAndContactId(applyUserId, contactId);
+		if(null != userContact &&UserContactStatusEnum.BLACKLIST_BE.getStatus().equals(userContact.getStatus())) {
+			throw new BusinessException("已经被对方拉黑 无法添加");
 
+		}
+		if(UserContactTypeEnum.GROUP ==contactTypeEnum){
+			GroupInfo groupInfo = groupInfoMapper.selectByGroupId(contactId);
+			if(null == groupInfo || GroupStatusEnum.DISSOLUTION.getStatus().equals(groupInfo.getStatus())) {
+				throw  new BusinessException("群聊不存在或者已经解散");
+			}
+			receiveUserId =groupInfo.getGroupOwnerId();
+			joinType =groupInfo.getJoinType();
+		}else {
+			UserInfo userInfo = userInfoMapper.selectByUserId(contactId);
+			if(null == userInfo) {
+				throw  new BusinessException(ResponseCodeEnum.CODE_600);
+			}
+			joinType = userInfo.getJoinType();
+		}
+		return 1;
 	}
 }
