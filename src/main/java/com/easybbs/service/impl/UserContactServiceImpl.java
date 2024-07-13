@@ -9,22 +9,22 @@ import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
 import com.easybbs.entity.enums.*;
 import com.easybbs.entity.po.GroupInfo;
+import com.easybbs.entity.po.UserContactApply;
 import com.easybbs.entity.po.UserInfo;
-import com.easybbs.entity.query.GroupInfoQuery;
-import com.easybbs.entity.query.UserInfoQuery;
+import com.easybbs.entity.query.*;
 import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.GroupInfoMapper;
+import com.easybbs.mappers.UserContactApplyMapper;
 import com.easybbs.mappers.UserInfoMapper;
 import com.easybbs.utils.CopyTools;
 import org.springframework.stereotype.Service;
 
-import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.entity.po.UserContact;
 import com.easybbs.entity.vo.PaginationResultVO;
-import com.easybbs.entity.query.SimplePage;
 import com.easybbs.mappers.UserContactMapper;
 import com.easybbs.service.UserContactService;
 import com.easybbs.utils.StringTools;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -41,6 +41,9 @@ public class UserContactServiceImpl implements UserContactService {
 
 	@Resource
 	private GroupInfoMapper<GroupInfo, GroupInfoQuery> groupInfoMapper;
+
+	@Resource
+	private UserContactApplyMapper<UserContactApply, UserContactApplyQuery> userContactApplyMapper;
 	/**
 	 * 根据条件查询列表
 	 */
@@ -181,6 +184,7 @@ public class UserContactServiceImpl implements UserContactService {
 	}
 
 	@Override
+	@Transactional
 	public Integer applyAdd(TokenUserInfoDto tokenUserInfoDto, String contactId, String applyInfo) {
 		UserContactTypeEnum contactTypeEnum = UserContactTypeEnum.getByPrefix(contactId);
 		if(null== contactTypeEnum) {
@@ -214,6 +218,36 @@ public class UserContactServiceImpl implements UserContactService {
 			}
 			joinType = userInfo.getJoinType();
 		}
-		return 1;
+		//直接加入不用记录申请
+		if(JoinTypeEnum.JOIN.getType().equals(joinType)){
+			//TODO 添加联系人
+			return  joinType;
+		}
+		//判断有没有申请过
+		UserContactApply dbApply = this.userContactApplyMapper.selectByApplyUserIdAndReceiveUserIdAndContactId(applyUserId,receiveUserId,contactId);
+		if(null == dbApply) {
+			UserContactApply contactApply = new UserContactApply();
+			contactApply.setApplyUserId(applyUserId);
+			contactApply.setContactType(contactTypeEnum.getType());
+			contactApply.setReceiveUserId(receiveUserId);
+			contactApply.setLastApplyTime(curTime);
+			contactApply.setContactId(contactId);
+			contactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());
+			this.userContactApplyMapper.insert(contactApply);
+
+		}else{
+			//如果之前申请过 现在更新状态
+			UserContactApply contactApply = new UserContactApply();
+			//重置为初始化状态
+			contactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());
+			contactApply.setLastApplyTime(curTime);
+			contactApply.setApplyInfo(applyInfo);
+			this.userContactApplyMapper.updateByApplyId(contactApply,dbApply.getApplyId());
+		}
+
+		if(dbApply==null || !UserContactApplyStatusEnum.INIT.getStatus().equals(dbApply.getStatus())){
+			//TODO 发送ws消息   如果第一次申请 或者之前申请已经被处理过
+		}
+		return joinType;
 	}
 }
