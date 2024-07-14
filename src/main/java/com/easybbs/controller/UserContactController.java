@@ -3,8 +3,11 @@ package com.easybbs.controller;
 import com.easybbs.annotation.GlobalInterceptor;
 import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
+import com.easybbs.entity.enums.PageSize;
 import com.easybbs.entity.po.UserContactApply;
 import com.easybbs.entity.po.UserInfo;
+import com.easybbs.entity.query.UserContactApplyQuery;
+import com.easybbs.entity.vo.PaginationResultVO;
 import com.easybbs.entity.vo.ResponseVO;
 import com.easybbs.service.UserContactApplyService;
 import com.easybbs.service.UserContactService;
@@ -52,6 +55,21 @@ public class UserContactController extends  ABaseController {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
         Integer joinType = userContactService.applyAdd(tokenUserInfoDto,contactId,applyInfo);
         return getSuccessResponseVO(joinType);
+    }
+
+    //获取好友申请列表
+    @RequestMapping("/loadApply")
+    @GlobalInterceptor
+    public ResponseVO loadApply(HttpServletRequest request,Integer pageNo) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        UserContactApplyQuery applyQuery = new UserContactApplyQuery();
+        applyQuery.setOrderBy("last_apply_time desc");
+        applyQuery.setReceiveUserId(tokenUserInfoDto.getUserId());
+        applyQuery.setPageNo(pageNo);
+        applyQuery.setPageSize(PageSize.SIZE15.getSize());
+        applyQuery.setQueryContactInfo(true);
+        PaginationResultVO resultVO = userContactApplyService.findListByPage(applyQuery);
+        return getSuccessResponseVO(resultVO);
     }
 }
 

@@ -20,6 +20,13 @@ public class UserContactApplyQuery extends BaseParam {
 
 	private String applyUserIdFuzzy;
 
+
+
+	/**
+	 * 是否关联查找名称
+	 */
+	private  Boolean queryContactInfo;
+
 	/**
 	 * 接收人id
 	 */
@@ -56,6 +63,13 @@ public class UserContactApplyQuery extends BaseParam {
 
 	private String applyInfoFuzzy;
 
+	public Boolean getQueryContactInfo() {
+		return queryContactInfo;
+	}
+
+	public void setQueryContactInfo(Boolean queryContactInfo) {
+		this.queryContactInfo = queryContactInfo;
+	}
 
 	public void setApplyId(Integer applyId){
 		this.applyId = applyId;
