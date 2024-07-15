@@ -62,6 +62,8 @@ public class UserContactApply implements Serializable {
 
     private String statusName;
 
+
+
     public String getStatusName() {
         UserContactApplyStatusEnum statusEnum = UserContactApplyStatusEnum.getByStatus(status);
         return statusEnum == null ? null : statusEnum.getDesc();
