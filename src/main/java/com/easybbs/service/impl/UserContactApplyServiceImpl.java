@@ -1,9 +1,19 @@
 package com.easybbs.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.xml.crypto.Data;
 
+import com.easybbs.entity.enums.ResponseCodeEnum;
+import com.easybbs.entity.enums.UserContactApplyStatusEnum;
+import com.easybbs.entity.enums.UserContactStatusEnum;
+import com.easybbs.entity.po.UserContact;
+import com.easybbs.entity.query.UserContactQuery;
+import com.easybbs.exception.BusinessException;
+import com.easybbs.mappers.UserContactMapper;
+import com.easybbs.service.UserContactService;
 import org.springframework.stereotype.Service;
 
 import com.easybbs.entity.enums.PageSize;
@@ -14,6 +24,7 @@ import com.easybbs.entity.query.SimplePage;
 import com.easybbs.mappers.UserContactApplyMapper;
 import com.easybbs.service.UserContactApplyService;
 import com.easybbs.utils.StringTools;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -25,6 +36,8 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 	@Resource
 	private UserContactApplyMapper<UserContactApply, UserContactApplyQuery> userContactApplyMapper;
 
+	@Resource
+	private UserContactMapper<UserContact, UserContactQuery> userContactMapper;
 	/**
 	 * 根据条件查询列表
 	 */
@@ -150,5 +163,49 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 	@Override
 	public Integer deleteUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(String applyUserId, String receiveUserId, String contactId) {
 		return this.userContactApplyMapper.deleteByApplyUserIdAndReceiveUserIdAndContactId(applyUserId, receiveUserId, contactId);
+	}
+
+	@Override
+	@Transactional
+	public void dealWithApply(String userId, Integer applyId, Integer status) {
+		UserContactApplyStatusEnum statusEnum = UserContactApplyStatusEnum.getByStatus(status);
+		//参数校验
+		if(statusEnum == null || UserContactApplyStatusEnum.INIT == statusEnum) {
+			throw  new BusinessException(ResponseCodeEnum.CODE_600);
+		}
+		UserContactApply applyInfo = this.userContactApplyMapper.selectByApplyId(applyId);
+		if(applyInfo == null || !userId.equals(applyInfo.getReceiveUserId())) {
+			throw  new BusinessException(ResponseCodeEnum.CODE_600);
+		}
+		UserContactApply updateInfo = new UserContactApply();
+		updateInfo.setStatus(statusEnum.getStatus());
+		updateInfo.setLastApplyTime(System.currentTimeMillis());
+
+		UserContactApplyQuery applyQuery = new UserContactApplyQuery();
+		applyQuery.setApplyId(applyId);
+		applyQuery.setStatus(UserContactApplyStatusEnum.INIT.getStatus());
+		//查更新记录数 防止并发操作
+		Integer count = userContactApplyMapper.updateByParam(updateInfo,applyQuery);
+		if(count==0){
+			throw  new BusinessException(ResponseCodeEnum.CODE_600);
+		}
+
+		//接受
+		if(UserContactApplyStatusEnum.PASS.getStatus().equals(status)){
+			//TODO 添加联系人
+			return;
+		}
+		//
+		if(UserContactApplyStatusEnum.BLACKLIST==statusEnum){
+			Date currentDate = new Date();
+			UserContact userContact = new UserContact();
+			userContact.setUserId(applyInfo.getApplyUserId());
+			userContact.setContactId(applyInfo.getContactId());
+			userContact.setContactType(applyInfo.getContactType());
+			userContact.setCreateTime(currentDate);
+			userContact.setStatus(UserContactStatusEnum.BLACKLIST_BE.getStatus());
+			userContact.setLastUpdateTime(currentDate);
+			userContactMapper.insertOrUpdate(userContact);
+		}
 	}
 }

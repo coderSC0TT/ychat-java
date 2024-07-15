@@ -71,5 +71,14 @@ public class UserContactController extends  ABaseController {
         PaginationResultVO resultVO = userContactApplyService.findListByPage(applyQuery);
         return getSuccessResponseVO(resultVO);
     }
+    //获取好友申请列表
+    @RequestMapping("/dealWithApply")
+    @GlobalInterceptor
+    public ResponseVO dealWithApply(HttpServletRequest request,@NotEmpty Integer applyId,@NotEmpty Integer status) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        this.userContactApplyService.dealWithApply(tokenUserInfoDto.getUserId(),applyId,status);
+
+        return getSuccessResponseVO(null);
+    }
 }
 
