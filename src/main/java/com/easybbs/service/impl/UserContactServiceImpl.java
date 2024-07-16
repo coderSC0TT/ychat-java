@@ -16,6 +16,7 @@ import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.GroupInfoMapper;
 import com.easybbs.mappers.UserContactApplyMapper;
 import com.easybbs.mappers.UserInfoMapper;
+import com.easybbs.service.UserContactApplyService;
 import com.easybbs.utils.CopyTools;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service("userContactService")
 public class UserContactServiceImpl implements UserContactService {
+
+	@Resource
+	private UserContactApplyService userContactApplyService;
 
 	@Resource
 	private UserContactMapper<UserContact, UserContactQuery> userContactMapper;
@@ -221,6 +225,7 @@ public class UserContactServiceImpl implements UserContactService {
 		//直接加入不用记录申请
 		if(JoinTypeEnum.JOIN.getType().equals(joinType)){
 			//TODO 添加联系人
+			userContactApplyService.addContact(applyUserId,receiveUserId,contactId,contactTypeEnum.getType(),applyInfo);
 			return  joinType;
 		}
 		//判断有没有申请过

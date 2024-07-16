@@ -6,17 +6,17 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.xml.crypto.Data;
 
-import com.easybbs.entity.enums.ResponseCodeEnum;
-import com.easybbs.entity.enums.UserContactApplyStatusEnum;
-import com.easybbs.entity.enums.UserContactStatusEnum;
+import com.easybbs.entity.dto.SysSettingDto;
+import com.easybbs.entity.enums.*;
 import com.easybbs.entity.po.UserContact;
 import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.UserContactMapper;
+import com.easybbs.redis.RedisComponent;
 import com.easybbs.service.UserContactService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.easybbs.entity.enums.PageSize;
 import com.easybbs.entity.query.UserContactApplyQuery;
 import com.easybbs.entity.po.UserContactApply;
 import com.easybbs.entity.vo.PaginationResultVO;
@@ -38,6 +38,9 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 
 	@Resource
 	private UserContactMapper<UserContact, UserContactQuery> userContactMapper;
+    @Autowired
+    private RedisComponent redisComponent;
+
 	/**
 	 * 根据条件查询列表
 	 */
@@ -190,9 +193,9 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 			throw  new BusinessException(ResponseCodeEnum.CODE_600);
 		}
 
-		//接受
+		//接受后添加联系人
 		if(UserContactApplyStatusEnum.PASS.getStatus().equals(status)){
-			//TODO 添加联系人
+			this.addContact(applyInfo.getApplyUserId(),applyInfo.getReceiveUserId(),applyInfo.getContactId(),applyInfo.getContactType(),applyInfo.getApplyInfo());
 			return;
 		}
 		//
@@ -207,5 +210,24 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 			userContact.setLastUpdateTime(currentDate);
 			userContactMapper.insertOrUpdate(userContact);
 		}
+	}
+
+	@Override
+	public void addContact(String applyUserId, String receiveUserId, String contactId, Integer contactType, String applyInfo) {
+		//群聊人数限制
+		if(UserContactTypeEnum.GROUP.getType().equals(contactType)){
+			UserContactQuery userContactQuery = new UserContactQuery();
+			userContactQuery.setContactId(contactId);
+			userContactQuery.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			Integer count = userContactMapper.selectCount(userContactQuery);
+			SysSettingDto sysSettingDto = redisComponent.getSysSetting();
+			if(count>sysSettingDto.getMaxGroupCount()){
+				throw new  BusinessException("成员已满无法加入");
+			}
+		}
+		Date currentDate = new Date();
+		//同意 双方添加好友
+
+
 	}
 }

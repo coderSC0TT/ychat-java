@@ -88,4 +88,6 @@ public interface UserContactApplyService {
 	Integer deleteUserContactApplyByApplyUserIdAndReceiveUserIdAndContactId(String applyUserId,String receiveUserId,String contactId);
 
 	void dealWithApply(String userId, Integer applyId,Integer status);
+
+	void addContact(String applyUserId,String receiveUserId,String contactId,Integer contactType,String applyInfo);
 }
