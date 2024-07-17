@@ -4,11 +4,16 @@ import com.easybbs.annotation.GlobalInterceptor;
 import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
 import com.easybbs.entity.enums.PageSize;
+import com.easybbs.entity.enums.ResponseCodeEnum;
+import com.easybbs.entity.enums.UserContactStatusEnum;
+import com.easybbs.entity.enums.UserContactTypeEnum;
 import com.easybbs.entity.po.UserContactApply;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.query.UserContactApplyQuery;
+import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.entity.vo.PaginationResultVO;
 import com.easybbs.entity.vo.ResponseVO;
+import com.easybbs.exception.BusinessException;
 import com.easybbs.service.UserContactApplyService;
 import com.easybbs.service.UserContactService;
 import com.easybbs.service.UserInfoService;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @ClassName UserContactController
@@ -77,7 +83,23 @@ public class UserContactController extends  ABaseController {
     public ResponseVO dealWithApply(HttpServletRequest request,@NotEmpty Integer applyId,@NotEmpty Integer status) {
         TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
         this.userContactApplyService.dealWithApply(tokenUserInfoDto.getUserId(),applyId,status);
+        return getSuccessResponseVO(null);
+    }
 
+    @RequestMapping("/loadContact")
+    @GlobalInterceptor
+    public ResponseVO loadContact(HttpServletRequest request, @NotNull String contactType) {
+        UserContactTypeEnum contactTypeEnum = UserContactTypeEnum.getByName(contactType);
+        if(null == contactTypeEnum) {
+            throw  new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        UserContactQuery contactQuery = new UserContactQuery();
+        contactQuery.setUserId(tokenUserInfoDto.getUserId());
+        contactQuery.setContactType(contactTypeEnum.getType());
+        if(contactTypeEnum == UserContactTypeEnum.USER){
+
+        }
         return getSuccessResponseVO(null);
     }
 }
