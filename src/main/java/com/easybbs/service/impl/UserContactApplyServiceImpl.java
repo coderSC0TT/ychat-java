@@ -1,5 +1,6 @@
 package com.easybbs.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -227,7 +228,31 @@ public class UserContactApplyServiceImpl implements UserContactApplyService {
 		}
 		Date currentDate = new Date();
 		//同意 双方添加好友
+		List<UserContact> contactList = new ArrayList<>();
+		//申请人添加对方
+		UserContact userContact = new UserContact();
+		userContact.setUserId(applyUserId);
+		userContact.setContactId(contactId);
+		userContact.setContactType(contactType);
+		userContact.setCreateTime(currentDate);
+		userContact.setLastUpdateTime(currentDate);
+		userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+		contactList.add(userContact);
+		//如果是申请好友 接受人添加申请人 群组不用添加对方为好友
+		if(UserContactTypeEnum.USER.getType().equals(contactType)){
+			userContact = new UserContact();
+			userContact.setUserId(receiveUserId);
+			userContact.setContactId(applyUserId);
+			userContact.setContactType(contactType);
+			userContact.setCreateTime(currentDate);
+			userContact.setLastUpdateTime(currentDate);
+			userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			contactList.add(userContact);
+		}
+		//批量插入
+		userContactMapper.insertOrUpdateBatch(contactList);
+		//TODO 如果是好友 接收人也添加申请人为好友 有消息发送 添加缓存
 
-
+		//TODO 创建会话 发送消息
 	}
 }
