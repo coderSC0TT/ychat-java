@@ -28,7 +28,7 @@
 
 	<sql id="base_condition_filed">
 		<if test="query.userId != null and query.userId!=''">
-			 and  user_id = #{query.userId}
+			 and  c.user_id = #{query.userId}
 		</if>
 		<if test="query.contactId != null and query.contactId!=''">
 			 and  contact_id = #{query.contactId}
@@ -76,8 +76,11 @@
 	<select id="selectList" resultMap="base_result_map" >
 		 SELECT c.*
 		 <if test="query.queryUserInfo or query.queryContactUserInfo" >
-			 u.nick_name contactName,u.sex sex
+			 ,u.nick_name contactName,u.sex sex
 		 </if>
+		<if test="query.queryUserInfo">
+			inner join user_info u on c.user_id = u.user_id
+		</if>
 		 From user_contact c
 		<if test="query.queryContactUserInfo">
 		    inner join user_info u on c.contact_id = u.user_id
