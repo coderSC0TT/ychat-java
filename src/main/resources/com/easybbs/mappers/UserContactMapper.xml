@@ -75,12 +75,15 @@
 	<!-- 查询集合-->
 	<select id="selectList" resultMap="base_result_map" >
 		 SELECT c.*
-		 <if test="query.queryUserInfo">
+		 <if test="query.queryUserInfo or query.queryContactUserInfo" >
 			 u.nick_name contactName,u.sex sex
 		 </if>
 		 From user_contact c
-		<if test="query.queryUserInfo">
-		    inner join user_info u on c.user_id = u.user_id
+		<if test="query.queryContactUserInfo">
+		    inner join user_info u on c.contact_id = u.user_id
+		</if>
+		<if test="query.queryGroupInfo">
+			inner join group_info  g on c.contact_id = g.group_id
 		</if>
 		 <include refid="query_condition" />
 		 <if test="query.orderBy!=null">

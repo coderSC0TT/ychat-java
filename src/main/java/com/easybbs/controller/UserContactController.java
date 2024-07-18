@@ -7,6 +7,7 @@ import com.easybbs.entity.enums.PageSize;
 import com.easybbs.entity.enums.ResponseCodeEnum;
 import com.easybbs.entity.enums.UserContactStatusEnum;
 import com.easybbs.entity.enums.UserContactTypeEnum;
+import com.easybbs.entity.po.UserContact;
 import com.easybbs.entity.po.UserContactApply;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.query.UserContactApplyQuery;
@@ -24,6 +25,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @ClassName UserContactController
@@ -98,9 +100,14 @@ public class UserContactController extends  ABaseController {
         contactQuery.setUserId(tokenUserInfoDto.getUserId());
         contactQuery.setContactType(contactTypeEnum.getType());
         if(contactTypeEnum == UserContactTypeEnum.USER){
-
+            //查用户信息
+            contactQuery.setQueryContactUserInfo(true);
+        }else if(UserContactTypeEnum.GROUP == contactTypeEnum){
+            contactQuery.setQueryGroupInfo(true);
         }
-        return getSuccessResponseVO(null);
+        contactQuery.setOrderBy("last_update_time desc");
+        List<UserContact> contactList=userContactService.findListByParam(contactQuery);
+        return getSuccessResponseVO(contactList);
     }
 }
 

@@ -53,6 +53,26 @@ public class UserContactQuery extends BaseParam {
 
 	private  Boolean queryUserInfo;
 
+	private  Boolean queryGroupInfo;
+
+	private  Boolean queryContactUserInfo;
+
+	public Boolean getQueryContactUserInfo() {
+		return queryContactUserInfo;
+	}
+
+	public void setQueryContactUserInfo(Boolean queryContactUserInfo) {
+		this.queryContactUserInfo = queryContactUserInfo;
+	}
+
+	public Boolean getQueryGroupInfo() {
+		return queryGroupInfo;
+	}
+
+	public void setQueryGroupInfo(Boolean queryGroupInfo) {
+		this.queryGroupInfo = queryGroupInfo;
+	}
+
 	public Boolean getQueryUserInfo() {
 		return queryUserInfo;
 	}
