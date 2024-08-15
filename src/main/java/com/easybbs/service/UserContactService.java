@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
+import com.easybbs.entity.enums.UserContactStatusEnum;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.entity.po.UserContact;
@@ -81,4 +82,8 @@ public interface UserContactService {
 	 * 直接加入还是发送申请
 	 */
 	Integer applyAdd(TokenUserInfoDto tokenUserInfoDto,String contactId,String applyInfo);
+
+	void removeUserContact(String userId, String contactId, UserContactStatusEnum statusEnum);
+
+	void addContact(String applyUserId,String receiveUserId,String contactId,Integer contactType,String applyInfo);
 }

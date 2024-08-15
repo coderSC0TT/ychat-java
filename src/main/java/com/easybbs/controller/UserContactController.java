@@ -121,7 +121,7 @@ public class UserContactController extends  ABaseController {
         return getSuccessResponseVO(contactList);
     }
 
-    //点头像获取联系人详情
+    //点头像获取联系人详情 不一定是好友
     @RequestMapping("/getContactInfo")
     @GlobalInterceptor
     public ResponseVO getContactInfo(HttpServletRequest request, @NotNull String contactId) {
@@ -139,7 +139,7 @@ public class UserContactController extends  ABaseController {
     }
 
 
-    //查联系人详情
+    //查联系人详情 必须是好友
     @RequestMapping("/getContactUserInfo")
     @GlobalInterceptor
     public ResponseVO getContactUserInfo(HttpServletRequest request, @NotNull String contactId) {
@@ -156,6 +156,25 @@ public class UserContactController extends  ABaseController {
         UserInfoVO userInfoVO = CopyTools.copy(userInfo, UserInfoVO.class);
 
         return getSuccessResponseVO(userInfoVO);
+    }
+
+
+    //删除联系人(先获取 才能删除拉黑)
+    @RequestMapping("/delContact")
+    @GlobalInterceptor
+    public ResponseVO delContact(HttpServletRequest request, @NotNull String contactId) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        userContactService.removeUserContact(tokenUserInfoDto.getUserId(),contactId,UserContactStatusEnum.DEL);
+        return getSuccessResponseVO(null);
+    }
+
+    //拉黑联系人
+    @RequestMapping("/delContact2BlackList")
+    @GlobalInterceptor
+    public ResponseVO delContact2BlackList(HttpServletRequest request, @NotNull String contactId) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        userContactService.removeUserContact(tokenUserInfoDto.getUserId(),contactId,UserContactStatusEnum.BLACKLIST);
+        return getSuccessResponseVO(null);
     }
 }
 

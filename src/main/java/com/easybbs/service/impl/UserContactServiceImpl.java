@@ -1,10 +1,13 @@
 package com.easybbs.service.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 import com.easybbs.entity.constants.Constants;
+import com.easybbs.entity.dto.SysSettingDto;
 import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.dto.UserContactSearchResultDto;
 import com.easybbs.entity.enums.*;
@@ -16,6 +19,7 @@ import com.easybbs.exception.BusinessException;
 import com.easybbs.mappers.GroupInfoMapper;
 import com.easybbs.mappers.UserContactApplyMapper;
 import com.easybbs.mappers.UserInfoMapper;
+import com.easybbs.redis.RedisComponent;
 import com.easybbs.service.UserContactApplyService;
 import com.easybbs.utils.CopyTools;
 import jodd.util.ArraysUtil;
@@ -35,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("userContactService")
 public class UserContactServiceImpl implements UserContactService {
 
+	@Resource
+	private RedisComponent redisComponent;
 	@Resource
 	private UserContactApplyService userContactApplyService;
 
@@ -230,7 +236,7 @@ public class UserContactServiceImpl implements UserContactService {
 		//直接加入不用记录申请
 		if(JoinTypeEnum.JOIN.getType().equals(joinType)){
 			//TODO 添加联系人
-			userContactApplyService.addContact(applyUserId,receiveUserId,contactId,contactTypeEnum.getType(),applyInfo);
+			this.addContact(applyUserId,receiveUserId,contactId,contactTypeEnum.getType(),applyInfo);
 			return  joinType;
 		}
 		//判断有没有申请过
@@ -260,4 +266,68 @@ public class UserContactServiceImpl implements UserContactService {
 		}
 		return joinType;
 	}
+
+	@Override
+	public void addContact(String applyUserId, String receiveUserId, String contactId, Integer contactType, String applyInfo) {
+		//群聊人数限制
+		if(UserContactTypeEnum.GROUP.getType().equals(contactType)){
+			UserContactQuery userContactQuery = new UserContactQuery();
+			userContactQuery.setContactId(contactId);
+			userContactQuery.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			Integer count = userContactMapper.selectCount(userContactQuery);
+			SysSettingDto sysSettingDto = redisComponent.getSysSetting();
+			if(count>sysSettingDto.getMaxGroupCount()){
+				throw new  BusinessException("成员已满无法加入");
+			}
+		}
+		Date currentDate = new Date();
+		//同意 双方添加好友
+		List<UserContact> contactList = new ArrayList<>();
+		//申请人添加对方
+		UserContact userContact = new UserContact();
+		userContact.setUserId(applyUserId);
+		userContact.setContactId(contactId);
+		userContact.setContactType(contactType);
+		userContact.setCreateTime(currentDate);
+		userContact.setLastUpdateTime(currentDate);
+		userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+		contactList.add(userContact);
+		//如果是申请好友 接受人添加申请人 群组不用添加对方为好友
+		if(UserContactTypeEnum.USER.getType().equals(contactType)){
+			userContact = new UserContact();
+			userContact.setUserId(receiveUserId);
+			userContact.setContactId(applyUserId);
+			userContact.setContactType(contactType);
+			userContact.setCreateTime(currentDate);
+			userContact.setLastUpdateTime(currentDate);
+			userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());
+			contactList.add(userContact);
+		}
+		//批量插入
+		userContactMapper.insertOrUpdateBatch(contactList);
+		//TODO 如果是好友 接收人也添加申请人为好友 有消息发送 添加缓存
+
+		//TODO 创建会话 发送消息
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void removeUserContact(String userId, String contactId, UserContactStatusEnum statusEnum) {
+		//移除好友
+		UserContact userContact = new UserContact();
+		userContact.setStatus(statusEnum.getStatus());
+		userContactMapper.updateByUserIdAndContactId(userContact,userId,contactId);
+		//好友也移除自己
+		UserContact friendContact = new UserContact();
+		if(UserContactStatusEnum.DEL==statusEnum){ //删除
+			friendContact.setStatus(UserContactStatusEnum.DEL_BE.getStatus());
+		} else if (UserContactStatusEnum.BLACKLIST==statusEnum) { //拉黑
+			friendContact.setStatus(UserContactStatusEnum.BLACKLIST_BE.getStatus());
+		}
+		userContactMapper.updateByUserIdAndContactId(friendContact,contactId,userId);
+		//TODO 从我的好友列表缓存中删除
+		//TODO 从好友列表缓存中删除自己
+	}
+
+
 }
