@@ -20,6 +20,7 @@ import com.easybbs.service.UserContactApplyService;
 import com.easybbs.service.UserContactService;
 import com.easybbs.service.UserInfoService;
 import com.easybbs.utils.CopyTools;
+import jodd.util.ArraysUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -120,7 +121,7 @@ public class UserContactController extends  ABaseController {
         return getSuccessResponseVO(contactList);
     }
 
-    //获取联系人详情
+    //点头像获取联系人详情
     @RequestMapping("/getContactInfo")
     @GlobalInterceptor
     public ResponseVO getContactInfo(HttpServletRequest request, @NotNull String contactId) {
@@ -133,6 +134,26 @@ public class UserContactController extends  ABaseController {
         if(userContact!=null){
             userInfoVO.setContactStatus(UserContactStatusEnum.FRIEND.getStatus());
         }
+
+        return getSuccessResponseVO(userInfoVO);
+    }
+
+
+    //查联系人详情
+    @RequestMapping("/getContactUserInfo")
+    @GlobalInterceptor
+    public ResponseVO getContactUserInfo(HttpServletRequest request, @NotNull String contactId) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        UserContact userContact = userContactService.getUserContactByUserIdAndContactId(tokenUserInfoDto.getUserId(),contactId);
+        if(userContact==null || !ArraysUtil.contains(new Integer[]{
+                UserContactStatusEnum.FRIEND.getStatus(),
+                UserContactStatusEnum.DEL_BE.getStatus(),
+                UserContactStatusEnum.BLACKLIST_BE.getStatus(), //注意没有首次被拉黑 没有这些情况就是有问腿
+        },userContact.getStatus())){
+          throw  new BusinessException(ResponseCodeEnum.CODE_600);
+        }
+        UserInfo userInfo = userInfoService.getUserInfoByUserId(contactId);
+        UserInfoVO userInfoVO = CopyTools.copy(userInfo, UserInfoVO.class);
 
         return getSuccessResponseVO(userInfoVO);
     }
