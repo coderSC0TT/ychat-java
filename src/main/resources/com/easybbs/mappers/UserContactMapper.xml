@@ -87,6 +87,9 @@
 		</if>
 		<if test="query.queryGroupInfo">
 			inner join group_info  g on c.contact_id = g.group_id
+		    <if test="query.excludeMyGroup">
+				and g.group_owner_id!=c.user_id
+			</if>
 		</if>
 		 <include refid="query_condition" />
 		 <if test="query.orderBy!=null">

@@ -104,6 +104,7 @@ public class UserContactController extends  ABaseController {
             contactQuery.setQueryContactUserInfo(true);
         }else if(UserContactTypeEnum.GROUP == contactTypeEnum){
             contactQuery.setQueryGroupInfo(true);
+            contactQuery.setExcludeBygroup(true);
         }
         contactQuery.setOrderBy("last_update_time desc");
         List<UserContact> contactList=userContactService.findListByParam(contactQuery);

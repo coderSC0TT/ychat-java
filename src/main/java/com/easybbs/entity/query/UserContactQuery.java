@@ -57,6 +57,16 @@ public class UserContactQuery extends BaseParam {
 
 	private  Boolean queryContactUserInfo;
 
+	public Boolean getExcludeBygroup() {
+		return excludeBygroup;
+	}
+
+	public void setExcludeBygroup(Boolean excludeBygroup) {
+		this.excludeBygroup = excludeBygroup;
+	}
+
+	private Boolean excludeBygroup; //查询加入的群时过滤掉自己创建的
+
 	public Boolean getQueryContactUserInfo() {
 		return queryContactUserInfo;
 	}
