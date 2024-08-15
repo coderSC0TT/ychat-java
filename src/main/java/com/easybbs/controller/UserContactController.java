@@ -14,10 +14,12 @@ import com.easybbs.entity.query.UserContactApplyQuery;
 import com.easybbs.entity.query.UserContactQuery;
 import com.easybbs.entity.vo.PaginationResultVO;
 import com.easybbs.entity.vo.ResponseVO;
+import com.easybbs.entity.vo.UserInfoVO;
 import com.easybbs.exception.BusinessException;
 import com.easybbs.service.UserContactApplyService;
 import com.easybbs.service.UserContactService;
 import com.easybbs.service.UserInfoService;
+import com.easybbs.utils.CopyTools;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -88,6 +90,7 @@ public class UserContactController extends  ABaseController {
         return getSuccessResponseVO(null);
     }
 
+    //获取联系人
     @RequestMapping("/loadContact")
     @GlobalInterceptor
     public ResponseVO loadContact(HttpServletRequest request, @NotNull String contactType) {
@@ -107,8 +110,31 @@ public class UserContactController extends  ABaseController {
             contactQuery.setExcludeBygroup(true);
         }
         contactQuery.setOrderBy("last_update_time desc");
+        contactQuery.setStatusArray(new Integer[]{
+                UserContactStatusEnum.FRIEND.getStatus(),
+                UserContactStatusEnum.DEL_BE.getStatus(),
+                UserContactStatusEnum.BLACKLIST_BE_FIRST.getStatus(), //被拉黑也可看见 只是不能发消息
+        });
+
         List<UserContact> contactList=userContactService.findListByParam(contactQuery);
         return getSuccessResponseVO(contactList);
+    }
+
+    //获取联系人详情
+    @RequestMapping("/getContactInfo")
+    @GlobalInterceptor
+    public ResponseVO getContactInfo(HttpServletRequest request, @NotNull String contactId) {
+        TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+        UserInfo userInfo = userInfoService.getUserInfoByUserId(contactId);
+        UserInfoVO userInfoVO = CopyTools.copy(userInfo, UserInfoVO.class);
+        userInfoVO.setContactStatus(UserContactStatusEnum.NOT_FRIEND.getStatus());
+        //判断是不是联系人
+        UserContact userContact = userContactService.getUserContactByUserIdAndContactId(tokenUserInfoDto.getUserId(),contactId);
+        if(userContact!=null){
+            userInfoVO.setContactStatus(UserContactStatusEnum.FRIEND.getStatus());
+        }
+
+        return getSuccessResponseVO(userInfoVO);
     }
 }
 

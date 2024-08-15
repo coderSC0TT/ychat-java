@@ -57,6 +57,16 @@ public class UserContactQuery extends BaseParam {
 
 	private  Boolean queryContactUserInfo;
 
+	private  Integer[] statusArray;
+
+	public Integer[] getStatusArray() {
+		return statusArray;
+	}
+
+	public void setStatusArray(Integer[] statusArray) {
+		this.statusArray = statusArray;
+	}
+
 	public Boolean getExcludeBygroup() {
 		return excludeBygroup;
 	}

@@ -18,6 +18,7 @@ import com.easybbs.mappers.UserContactApplyMapper;
 import com.easybbs.mappers.UserInfoMapper;
 import com.easybbs.service.UserContactApplyService;
 import com.easybbs.utils.CopyTools;
+import jodd.util.ArraysUtil;
 import org.springframework.stereotype.Service;
 
 import com.easybbs.entity.po.UserContact;
@@ -204,7 +205,11 @@ public class UserContactServiceImpl implements UserContactService {
 		Integer joinType =null;
 		//查询对方是否是自己好友 如果已经被拉黑则不可添加
 		UserContact userContact = userContactMapper.selectByUserIdAndContactId(applyUserId, contactId);
-		if(null != userContact &&UserContactStatusEnum.BLACKLIST_BE.getStatus().equals(userContact.getStatus())) {
+		if(null != userContact &&
+				ArraysUtil.contains(new Integer[] {
+						UserContactStatusEnum.BLACKLIST_BE.getStatus(),
+					    UserContactStatusEnum.BLACKLIST_BE_FIRST.getStatus()
+		},userContact.getStatus())) {
 			throw new BusinessException("已经被对方拉黑 无法添加");
 
 		}
