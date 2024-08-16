@@ -61,7 +61,15 @@ public class UserInfoController extends ABaseController{
 		userInfo.setPassword(StringTools.encodeByMD5(password));
 		this.userInfoService.updateUserInfoByUserId(userInfo,tokenUserInfoDto.getUserId());
 		//TODO 修改密码后强制退出
-		return  getUserInfo(request);
+		return  getSuccessResponseVO(null);
+	}
+
+
+	@RequestMapping("/logout")
+	public ResponseVO logout(HttpServletRequest request, @NotNull String password) throws IOException {
+		TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+		//TODO 关闭ws连接 退出登录
+		return  getSuccessResponseVO(null);
 	}
 
 
