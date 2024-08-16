@@ -1,5 +1,6 @@
 package com.easybbs.service.impl;
 
+import java.io.File;
 import java.util.*;
 
 import javax.annotation.Resource;
@@ -25,6 +26,7 @@ import com.easybbs.mappers.UserInfoMapper;
 import com.easybbs.service.UserInfoService;
 import com.easybbs.utils.StringTools;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -241,6 +243,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 		return userInfoVO;
 	}
 
+
+
 	//判断是否为管理员
 	private TokenUserInfoDto getTokenUserInfoDto(UserInfo userInfo) {
 		TokenUserInfoDto tokenUserInfoDto = new TokenUserInfoDto();
@@ -254,6 +258,17 @@ public class UserInfoServiceImpl implements UserInfoService {
 			tokenUserInfoDto.setAdmin(false);
 		}
 		return tokenUserInfoDto;
+	}
+
+	@Override
+	public void updateUserInfo(UserInfo userInfo, MultipartFile avatarFile, MultipartFile avatarCover) {
+		if(avatarFile!=null){
+			String baseFoder = appConfig.getProjectFolder()+Constants.FILE_FOLDER_FILE;
+			File targetFileFolder = new File(baseFoder+Constants.FILE_FOLDER_AVATAR_NAME);
+			if(!targetFileFolder.exists()){ //如果目录不存在 手动创建
+				targetFileFolder.mkdirs();
+			}
+		}
 	}
 
 

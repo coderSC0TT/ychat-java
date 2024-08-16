@@ -2,15 +2,20 @@ package com.easybbs.controller;
 
 import java.util.List;
 
+import com.easybbs.entity.dto.TokenUserInfoDto;
 import com.easybbs.entity.query.UserInfoQuery;
 import com.easybbs.entity.po.UserInfo;
 import com.easybbs.entity.vo.ResponseVO;
+import com.easybbs.entity.vo.UserInfoVO;
 import com.easybbs.service.UserInfoService;
+import com.easybbs.utils.CopyTools;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 用户信息 Controller
@@ -21,6 +26,30 @@ public class UserInfoController extends ABaseController{
 
 	@Resource
 	private UserInfoService userInfoService;
+
+	@RequestMapping("/getUserInfo")
+	public ResponseVO getUserInfo(HttpServletRequest request){
+		TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+		UserInfo userInfo = userInfoService.getUserInfoByUserId(tokenUserInfoDto.getUserId());
+		UserInfoVO userInfoVO = CopyTools.copy(userInfo,UserInfoVO.class);
+		userInfoVO.setAdmin(tokenUserInfoDto.getAdmin()); //适不适合返回password
+		return  getSuccessResponseVO(userInfoVO);
+	}
+
+	@RequestMapping("/saveUserInfo")
+	public ResponseVO saveUserInfo(HttpServletRequest request, UserInfo userInfo, MultipartFile avatarFile,
+								   MultipartFile avatarCover){
+		TokenUserInfoDto tokenUserInfoDto = getTokenUserInfo(request);
+		userInfo.setUserId(tokenUserInfoDto.getUserId());
+		userInfo.setPassword(null);
+		userInfo.setStatus(null);
+		userInfo.setCreateTime(null);
+		userInfo.setLastLoginTime(null);//不能让随便改
+		this.userInfoService.updateUserInfo(userInfo, avatarFile, avatarCover);
+		return  getUserInfo(request);
+	}
+
+
 	/**
 	 * 根据条件分页查询
 	 */
