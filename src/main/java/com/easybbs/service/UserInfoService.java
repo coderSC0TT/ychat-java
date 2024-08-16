@@ -1,5 +1,6 @@
 package com.easybbs.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.easybbs.entity.dto.TokenUserInfoDto;
@@ -98,6 +99,6 @@ public interface UserInfoService {
 	UserInfoVO login(String email, String password);
 
 	void updateUserInfo(UserInfo userInfo, MultipartFile avatarFile,
-						MultipartFile avatarCover);
+						MultipartFile avatarCover) throws IOException;
 
 }
