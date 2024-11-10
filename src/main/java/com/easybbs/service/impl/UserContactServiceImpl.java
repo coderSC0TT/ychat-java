@@ -223,7 +223,7 @@ public class UserContactServiceImpl implements UserContactService {
 			GroupInfo groupInfo = groupInfoMapper.selectByGroupId(contactId);
 			if(null == groupInfo || GroupStatusEnum.DISSOLUTION.getStatus().equals(groupInfo.getStatus())) {
 				throw  new BusinessException("群聊不存在或者已经解散");
-			}
+			}//
 			receiveUserId =groupInfo.getGroupOwnerId();
 			joinType =groupInfo.getJoinType();
 		}else {
